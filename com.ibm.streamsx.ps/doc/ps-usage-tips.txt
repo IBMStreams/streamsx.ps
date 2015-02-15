@@ -1,0 +1,137 @@
+=========================================================================
+In-memory Process Store (ps) for IBM InfoSphere Streams
+
+[Streams Process Store (ps) toolkit to share data between 
+ FUSED operators by using an SPL-specific in-memory cache implementation.]
+
+Sep/10/2013
+=========================================================================
+This usage tips file provides high-level implementation details about the ps Streams toolkit.
+Our main effort here is to provide a Streams SPL toolkit that will allow data sharing
+between FUSED operators running inside a single PE (Processing Element).
+Our Process Store (ps) toolkit is implemented via the Streams C++ native
+function feature. That makes it very easy to call them anywhere in the
+SPL code as well as in the C++ primitive operator code.
+We believe that the Streams application designers/developers will be 
+able to do neat things with this data sharing facility available for use within a 
+single PE.
+
+Our ps toolkit provides a comprehensive set of SPL native function APIs.
+Streams application developers can perform the following  CRUD 
+(Create, Read, Update, Delete) operations simultaneously on numerous 
+stores that they might own, share, and manage within the context of 
+a single PE.
+
+Available ps native functions
+-----------------------------
+*****************************************************************************************
+* psCreateStore, psCreateOrGetStore, psFindStore, psRemoveStore, psPut, psGet,          *
+* psRemove, psHas, psClear, psSize, psBeginIteration, psGetNext, psEndIteration,        *
+* psSerialize, psDeserialize, psGetAllStoreInfo                                         *
+*****************************************************************************************
+
+We also provide the following locking functions. They can be used for
+multi-threaded store access by following a trust based cooperative locking scheme to
+gain exclusive access into the store for performing a set of transaction based store activities.
+
+Available lock native functions
+-------------------------------
+*****************************************************************************************
+* plCreateOrGetLock, plDestroyLock, plFindLock, plReadLock, plWriteLock, plUnlock       *
+*****************************************************************************************
+
+This toolkit was successfully compiled and tested in our labs using the following test environment.
+
+a) RedHat Enterprise Linux 6.4 (or an equivalent CentOS version) + gcc version 4.4.7 20120313 (Red Hat 4.4.7-3) (GCC)
+b) RedHat Enterprise Linux 5.9 (or an equivalent CentOS version) + gcc version 4.1.2 20080704 (Red Hat 4.1.2-54)
+c) IBM InfoSphere Streams Version 3.x
+
+Following are the files that can be found in this ps toolkit directory:
+
+com.ibm.streamsx.ps                  (Top-level toolkit directory)
+
+a) doc
+      --> ps-usage-tips.txt          (The file you are reading now)
+                                      
+b) com.ibm.streamsx/process/lock     (Store Locking)
+      --> native.function            (SPL Native Function directory)
+      --> function.xml               (SPL Native Function Model file)
+                                               
+c) com.ibm.streamsx/process/store    (Process Store)
+      --> native.function            (SPL Native Function directory)
+         --> function.xml            (SPL Native Function Model file)
+         
+d) impl/include                      (Directory where the include files for the ps will be present)
+                                     (Streams Native Function Model file is configured to look here for the include files)
+      --> ProcessLockWrappers.h      (C++ include file that contains the Streams native function entry point code for store locks)
+      --> ProcessStore.h             (C++ class interface file for the process store)
+      --> ProcessStoreValue.h        (Helper class for the process store)
+      --> ProcessStoreWrappersr.h    (C++ include file that contains the Streams native function entry point code for stores)
+      --> RWLock.h                   (C++ interface for the Read/Write lock logic)
+
+e) impl/src                          (Directory where the CPP files for the ps will be present)
+     --> ProcessStore.cpp            (C++ class implementation file for the process store)
+     --> ProcessStoreValue.cpp       (C++ class implementation for the process store helper logic)
+     --> RWLock.cpp                  (C++ class implementation for the store Read/Write logic)
+
+f) impl/mk                           (A shell script to build the shared object library of the C++ code shown above) 
+
+g) impl/lib                          (Directory into which the .so library built above will be copied)
+                                     (Streams Native Function Model file is configured to load .so from this directory)
+h) samples/ps_test_1 
+      --> PsTest1.spl                (Simple test application SPL file that invokes C++ native functions to
+                                      show the various ps features.)
+      --> bin                                        
+         --> build-standalone.sh     (Script that will build a Standalone Streams executable)
+         --> run-standalone.sh       (Script that will run the Standalone executable of this application)
+  
+High-level code details about this toolkit
+------------------------------------------
+As explained above, this toolkit consists of C++ code for generating the ps shared object (.so) file and 
+SPL code for a Streams test driver application. 
+
+Inside this toolkit, impl/src and impl/include directories contain the source code for the
+ps native function logic. Primarily, it provides the serialization/deserialization code and the
+store management layer code. A Wrapper include (.h) file is an important one and that 
+file provides an entry point for the SPL application to directly call a C++ class method.
+All the C++ logic will be compiled into a shared object library (.so) file and will be available to
+any outside SPL application that will have a dependency on this toolkit.
+
+This toolkit also contains a simple test SPL flow graph that is constructed to make a call chain to exercise
+different ps functions. Inside the ps toolkit directory, a native function model XML file outlines
+the meta information needed to directly call a C++ class method from SPL. This detail includes the 
+C++ wrapper include file name, C++ namespace containing the wrapper functions, 
+C++ wrapper function prototype expressed using SPL syntax/types, name of the shared object library 
+created within this toolkit, location of the shared object library, location of the wrapper 
+include file etc. SPL test application code in this toolkit demonstrates how two different fused operators
+can share their data between themselves using the ps APIs.
+
+Steps to build and run the test application to showcase all the features of ps
+-------------------------------------------------------------------------------  
+Following are the steps required to build and run the test application to showcase all the features of ps.
+If you really want, the ps core C++ code artifact can be built into a .so file before attempting to verify
+this toolkit. But, there is no need for that since we have already pre-built and packaged it for you inside
+this toolkit's impl/lib directory. Unless you really want to build the ps library on your own,
+you can skip steps 1 and 2 below.
+
+1) Switch to <your_base_dir>/com.ibm.streamsx.ps/impl directory and run ./mk
+2) If ./mk worked correctly, it should have built and copied the .so file to the following location.
+   <your_base_dir>/com.ibm.streamsx.ps/impl/lib/x86_64.RHEL6   (if you have a RHEL6 machine.)
+
+3) Switch to <your_base_dir>/com.ibm.streamsx.ps/samples/ps_test1/bin directory and run this script: ./build-standalone.sh.
+4) To test the application, you can run this script from <your_base_dir>/com.ibm.streamsx.ps/samples/ps_test1/bin: ./run-standalone.sh
+5) You can verify the application results that will be displayed on your Linux terminal console window.
+6) You can use the code shown in the SPL file as a reference and take advantage of the ps functions in your  
+   own applications to share data across multiple operators fused into a single PE. All you have to do is
+   simply compile your application with -t <path_containing_the_ps_toolkit_directory> and then add the following
+   two statements at the top of your SPL or splmm file(s).
+
+   use com.ibm.streamsx.process.store::*;
+   use com.ibm.streamsx.process.lock::*;
+
+(If you have a requirement to share data among multiple PEs, then please take a look at a
+ completely different Streams toolkit named Distributed Process Store [dps] that is
+ available for free from here: http://tinyurl.com/kebzwyo)
+   
+Good luck with sharing your data using the Streams Process Store (ps)
+=====================================================================

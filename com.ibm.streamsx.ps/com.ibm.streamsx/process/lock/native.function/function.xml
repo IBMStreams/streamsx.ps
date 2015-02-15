@@ -1,0 +1,69 @@
+<functionModel
+       xmlns="http://www.ibm.com/xmlns/prod/streams/spl/function"
+       xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/function functionModel.xsd">
+  <functionSet>
+    <headerFileName>ProcessLockWrappers.h</headerFileName>
+    <functions>
+      <function>
+        <description>Unlock the global read write lock.</description>
+        <prototype><![CDATA[ public stateful void plUnlock() ]]></prototype>
+      </function>
+      <function>
+        <description>Read lock the global read write lock.</description>
+        <prototype><![CDATA[ public stateful void plReadLock() ]]></prototype>
+      </function>
+      <function>
+        <description>Write lock the global read write lock.</description>
+        <prototype><![CDATA[ public stateful void plWriteLock() ]]></prototype>
+      </function>
+
+      <function>
+        <description>Create a read write lock. Return the lock handle.</description>
+        <prototype><![CDATA[ public stateful uint64 plCreateLock() ]]></prototype>
+      </function>
+      <function>
+        <description>Create a read write lock. Return the lock handle if
+        created, 0 otherwise (a process store with the same name
+        exists).</description>
+        <prototype><![CDATA[ public stateful uint64 plCreateLock(rstring nama) ]]></prototype>
+      </function>
+      <function>
+        <description>Create a read write lock or get it if it already exists. </description>
+        <prototype><![CDATA[ public stateful uint64 plCreateOrGetLock(rstring nama) ]]></prototype>
+      </function>
+      <function>
+        <description>Find a read write lock given its name. Return the lock
+        handle if found, 0 otherwise.</description>
+        <prototype><![CDATA[ public stateful uint64 plFindLock(rstring name) ]]></prototype>
+      </function>
+
+      <function>
+        <description>Unlock a read write lock.</description>
+        <prototype><![CDATA[ public stateful void plUnlock(uint64 lock) ]]></prototype>
+      </function>
+      <function>
+        <description>Read lock a read write lock.</description>
+        <prototype><![CDATA[ public stateful void plReadLock(uint64 lock) ]]></prototype>
+      </function>
+      <function>
+        <description>Write lock a read write lock.</description>
+        <prototype><![CDATA[ public stateful void plWriteLock(uint64 lock) ]]></prototype>
+      </function>
+      <function>
+        <description>Destroy a read write lock.</description>
+        <prototype><![CDATA[ public stateful void plDestroy(uint64 lock) ]]></prototype>
+      </function>
+    </functions>
+    <dependencies>
+      <library>
+        <cmn:description>Process store library</cmn:description>
+        <cmn:managedLibrary>
+          <cmn:lib>ProcessStoreLib</cmn:lib>
+         <cmn:command>../../../../impl/bin/archLevel</cmn:command>
+        </cmn:managedLibrary>
+      </library>
+    </dependencies>
+  </functionSet>
+</functionModel>

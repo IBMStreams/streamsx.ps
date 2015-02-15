@@ -1,0 +1,66 @@
+#!/bin/bash
+# Add -x to the line above to display the status of the statements below as they get executed.
+echo "============================================================================="
+date
+echo "Building the ProcessStore shared library now."
+echo ""
+CPP_BUILD_TARGET="ProcessStore"
+CPP_PS_VALUE_TARGET="ProcessStoreValue"
+CPP_RW_LOCK_TARGET="RWLock"
+FINAL_LIB_NAME="ProcessStoreLib"
+
+CXX=g++
+PLATFORM=`uname -i`
+
+if [ "$PLATFORM" == "ppc64" ];
+then
+   CXX=/opt/at5.0/bin/g++
+fi
+
+SPL_PKGCFG=$STREAMS_INSTALL/bin/dst-pe-pkg-config.sh
+SPL_PKG=dst-spl-pe-install
+SPL_COMPILE_OPTIONS=`$SPL_PKGCFG --cflags $SPL_PKG`
+SPL_LINK_OPTIONS=`$SPL_PKGCFG --libs $SPL_PKG`
+
+# Export this environment variable so that gcc will find our local copy of the 
+# libmemcached include files stored in the ./libmemcached-1.0 sub-directory of our
+# project's C++ source directory.
+export CPLUS_INCLUDE_PATH=./include
+
+$CXX -O3 -Wall -c -fmessage-length=0 -fPIC -D_REENTRANT -I include $SPL_COMPILE_OPTIONS src/$CPP_BUILD_TARGET.cpp
+$CXX -O3 -Wall -c -fmessage-length=0 -fPIC -D_REENTRANT -I include $SPL_COMPILE_OPTIONS src/$CPP_PS_VALUE_TARGET.cpp
+$CXX -O3 -Wall -c -fmessage-length=0 -fPIC -D_REENTRANT -I include $SPL_COMPILE_OPTIONS src/$CPP_RW_LOCK_TARGET.cpp
+$CXX -shared -o lib$FINAL_LIB_NAME.so $SPL_LINK_OPTIONS $CPP_BUILD_TARGET.o $CPP_PS_VALUE_TARGET.o $CPP_RW_LOCK_TARGET.o
+
+rm -f $CPP_BUILD_TARGET.o $CPP_PS_VALUE_TARGET.o $CPP_RW_LOCK_TARGET.o
+
+if [ -f /etc/redhat-release ] ; then
+ OSDIST=`awk 'FNR == 1 {print substr($1, 0)}' /etc/redhat-release`
+ if [ "$OSDIST" == 'Red' ]; then
+    OSDIST='RHEL'
+ fi
+
+ OSVER=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//`
+ OSLVL="$OSDIST${OSVER%%.*}"
+elif [ -f /etc/SuSE-release ] ; then
+ OSVER=`awk 'FNR == 2 {print $3}' /etc/SuSE-release`
+ OSLVL=SLES${OSVER}
+else
+  OSLVL="unsupported Linux distribution"
+fi
+
+if [ ! -d "./lib/$PLATFORM.$OSLVL" ]; then
+   mkdir ./lib/$PLATFORM.$OSLVL
+fi
+
+echo ""
+
+if [ -f lib$FINAL_LIB_NAME.so ]; then
+   mv lib$FINAL_LIB_NAME.so ./lib/$PLATFORM.$OSLVL
+   echo "A new .so file is now available in the ./lib/$PLATFORM.$OSLVL directory."
+else
+   echo "There were errors while building the ProcessStore shared library."
+fi
+
+date
+echo "============================================================================="
