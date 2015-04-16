@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<toolkitModel xmlns="http://www.ibm.com/xmlns/prod/streams/spl/toolkit" productVersion="3.1.0.0" xmlns:common="http://www.ibm.com/xmlns/prod/streams/spl/common" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<toolkitModel xmlns="http://www.ibm.com/xmlns/prod/streams/spl/toolkit" productVersion="4.0.0.0" xmlns:common="http://www.ibm.com/xmlns/prod/streams/spl/common" xmlns:ti="http://www.ibm.com/xmlns/prod/streams/spl/toolkitInfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-  <toolkit name="ps_test_1" requiredProductVersion="2.0.0" version="1.0.0">
+  <toolkit name="ps_test_1" requiredProductVersion="4.0.0.0" version="1.0.1">
     <description/>
     <uriTable>
       <uri index="1" value="PsTest1.spl"/>
     </uriTable>
     <namespace name="">
-      <compositeOp column="11" line="54" name="PsTest1" potentialMain="true" uriIndex="1"/>
-      <compositeOp column="11" line="63" name="OperationsTest" potentialMain="true" uriIndex="1"/>
+      <compositeOp column="11" line="61" name="PsTest1" potentialMain="true" uriIndex="1"/>
+      <compositeOp column="11" line="70" name="OperationsTest" potentialMain="true" uriIndex="1"/>
     </namespace>
     <dependency>
       <common:name>com.ibm.streamsx.ps</common:name>
-      <common:version>[1.0.0,2.0.0)</common:version>
+      <common:version>[2.0.0,3.0.0)</common:version>
     </dependency>
+    <sabFiles>
+      <ti:include path="toolkit.xml" root="toolkitDir"/>
+      <ti:include path="impl/java/lib/**" root="toolkitDir"/>
+      <ti:include path="impl/java/bin/**" root="toolkitDir"/>
+      <ti:include path="impl/bin/**" root="toolkitDir"/>
+      <ti:include path="impl/lib/**" root="toolkitDir"/>
+      <ti:include path="impl/nl/*.dat" root="toolkitDir"/>
+      <ti:include path="etc/**" root="toolkitDir"/>
+      <ti:include path="lib/**" root="toolkitDir"/>
+      <ti:include path="nl/**" root="toolkitDir"/>
+      <ti:include path="opt/**" root="toolkitDir"/>
+    </sabFiles>
   </toolkit>
 
 </toolkitModel>

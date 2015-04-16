@@ -1,11 +1,11 @@
-=========================================================================
+===============================================================================
 In-memory Process Store (ps) for IBM InfoSphere Streams
 
 [Streams Process Store (ps) toolkit to share data between 
  FUSED operators by using an SPL-specific in-memory cache implementation.]
 
-Sep/10/2013
-=========================================================================
+[Apr/15/2015]   [Version 2.0.0]   [Works with Streams 4.x and higher versions]
+===============================================================================
 This usage tips file provides high-level implementation details about the ps Streams toolkit.
 Our main effort here is to provide a Streams SPL toolkit that will allow data sharing
 between FUSED operators running inside a single PE (Processing Element).
@@ -44,7 +44,7 @@ This toolkit was successfully compiled and tested in our labs using the followin
 
 a) RedHat Enterprise Linux 6.4 (or an equivalent CentOS version) + gcc version 4.4.7 20120313 (Red Hat 4.4.7-3) (GCC)
 b) RedHat Enterprise Linux 5.9 (or an equivalent CentOS version) + gcc version 4.1.2 20080704 (Red Hat 4.1.2-54)
-c) IBM InfoSphere Streams Version 3.x
+c) IBM InfoSphere Streams Version 4.x and higher versions
 
 Following are the files that can be found in this ps toolkit directory:
 
